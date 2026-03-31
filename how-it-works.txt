@@ -1,0 +1,192 @@
+================================================================================
+FRAMEFORGE STORYBOARD GENERATOR - HOW IT WORKS
+================================================================================
+
+OVERVIEW
+--------
+FrameForge is a web-based storyboard creation tool for short films. It helps
+filmmakers and writers plan their visual storytelling by organizing scenes,
+camera work, dialogue, and mood into a structured sequence.
+
+A storyboard is like a comic book version of your film - each panel (we call
+them "frames") represents one camera shot. This tool lets you plan what each
+shot looks like, what happens in it, and how it connects to the next shot.
+
+
+================================================================================
+APPLICATION FLOW
+================================================================================
+
+1. WELCOME SCREEN (welcome-screen.tsx)
+   - First thing you see when opening the app
+   - Shows 6 feature cards explaining what the tool does
+   - Has a form to enter your project title
+   - Click "Start Creating" to enter the workspace
+
+2. WORKSPACE (workspace.tsx)
+   - Main editing environment split into sections:
+     * Header (top) - project title, settings, export button
+     * Guide sidebar (left, optional) - help text explaining features
+     * Scene editor (center) - where you edit the selected frame
+     * Frame preview (right, desktop only) - visual summary of frame
+     * Timeline (bottom) - strip of all your frames
+
+3. TIMELINE (timeline.tsx)
+   - Horizontal strip at the bottom showing all frames
+   - Each frame shows: number, title, shot type, transition arrow
+   - Click a frame to select and edit it
+   - Drag frames to reorder the sequence
+   - Use +/duplicate/delete buttons to manage frames
+   - Has minimize button to collapse when you need more space
+
+4. SCENE EDITOR (scene-editor.tsx)
+   - Tabbed interface with 4 sections:
+
+   VISUAL TAB:
+   - Shot Type: How much is visible (wide shot, close-up, etc.)
+   - Camera Angle: Where the camera is positioned (eye level, high, low)
+   - Camera Movement: Does camera move? (static, pan, dolly, etc.)
+   - Transition: How this shot connects to the next (cut, fade, dissolve)
+
+   NARRATIVE TAB:
+   - Scene Title: Name for this shot
+   - Location: Where does this take place?
+   - Characters: Who is in this shot?
+   - Action: What physically happens?
+   - Dialogue: What do characters say?
+   - Sound/Music: Audio notes (background music, sound effects)
+
+   SKETCH TAB:
+   - Drawing canvas to sketch rough compositions
+   - Pen tool with color picker and size slider
+   - Eraser tool
+   - Clear and undo buttons
+   - Helps visualize framing without needing art skills
+
+   TECHNICAL TAB:
+   - Mood: Emotional tone (tense, joyful, melancholic, etc.)
+   - Pacing: Speed of the scene (slow, moderate, fast)
+   - Time of Day: When does this happen?
+   - Duration: Estimated length in seconds
+   - Production Notes: Any other details for the crew
+
+5. EXPORT (export-dialog.tsx + export-storyboard.ts)
+   - Three export formats:
+     * HTML: Formatted document you can print or share
+     * JSON: Raw data file for importing into other tools
+     * CSV: Spreadsheet format for tables/planning documents
+
+
+================================================================================
+DATA STRUCTURE
+================================================================================
+
+The app stores data in two main objects:
+
+PROJECT METADATA:
+- title: Film name
+- director: Director name
+- genre: Film genre
+- logline: One-sentence summary
+- targetDuration: Estimated runtime
+
+SCENE FRAME (one per shot):
+- id: Unique identifier
+- sceneNumber: Order in sequence
+- title: Scene name
+- shotType: wide/medium/close-up/extreme-close-up/establishing/insert/pov
+- cameraAngle: eye-level/high/low/dutch/birds-eye/worms-eye
+- cameraMovement: static/pan/tilt/dolly/tracking/crane/handheld/zoom
+- transition: cut/fade/dissolve/wipe/match-cut/jump-cut/iris
+- description: What happens (action)
+- dialogue: Spoken lines
+- location: Setting
+- characters: Who appears
+- mood: Emotional tone
+- pacing: slow/moderate/fast
+- timeOfDay: dawn/morning/afternoon/evening/night
+- duration: Seconds
+- notes: Production notes
+- soundNotes: Audio direction
+- sketchData: Base64 image from sketch pad
+
+
+================================================================================
+STATE MANAGEMENT
+================================================================================
+
+All app state lives in use-storyboard.ts hook:
+
+- frames: Array of all scene frames
+- selectedFrameId: Currently selected frame (or null)
+- project: Project metadata
+
+Functions provided:
+- addFrame(): Creates new frame at end
+- updateFrame(id, changes): Edits a frame
+- removeFrame(id): Deletes a frame
+- duplicateFrame(id): Copies a frame
+- reorderFrames(fromIndex, toIndex): Drag-and-drop reorder
+- updateProject(changes): Edit project metadata
+- selectedFrame: Computed - the currently selected frame object
+
+
+================================================================================
+FILE STRUCTURE EXPLAINED
+================================================================================
+
+/app
+  page.tsx          - Entry point, renders StoryboardApp
+  layout.tsx        - HTML wrapper, fonts, metadata
+  globals.css       - Colors, spacing, theme variables
+
+/components/storyboard
+  welcome-screen.tsx   - Landing page before workspace
+  workspace.tsx        - Main layout combining all panels
+  header.tsx           - Top bar with title, buttons
+  timeline.tsx         - Bottom frame strip
+  scene-editor.tsx     - Tabbed form for editing frames
+  sketch-pad.tsx       - HTML canvas drawing tool
+  frame-preview.tsx    - Right panel showing frame summary
+  guide-sidebar.tsx    - Collapsible help panel
+  export-dialog.tsx    - Modal for choosing export format
+
+/lib
+  storyboard-types.ts  - TypeScript types, dropdown options
+  use-storyboard.ts    - React hook for all state
+  export-storyboard.ts - Functions to generate HTML/JSON/CSV
+
+
+================================================================================
+RUNNING LOCALLY
+================================================================================
+
+1. Make sure Node.js 18+ is installed
+
+2. Install pnpm if you don't have it:
+   npm install -g pnpm
+
+3. Install project dependencies:
+   pnpm install
+
+4. Start development server:
+   pnpm dev
+
+5. Open browser to http://localhost:3000
+
+
+================================================================================
+CUSTOMIZATION IDEAS
+================================================================================
+
+- Add image upload for reference photos
+- Add collaboration features (requires database)
+- Add AI scene description generation
+- Add aspect ratio presets for different formats
+- Add PDF export with better formatting
+- Add undo/redo for all changes (not just sketch)
+- Add keyboard shortcuts for power users
+- Add dark/light theme toggle
+
+
+================================================================================
